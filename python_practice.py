@@ -1,0 +1,551 @@
+import streamlit as st
+import random
+
+# List of approximately 50 common Python/Pandas/PySpark questions for the quiz.
+# Each question is a dict with 'question', 'options' (list), and 'correct' (index of correct option).
+questions = [
+    {
+        "question": "How do you create a Pandas DataFrame from a dictionary?",
+        "options": [
+            "pd.DataFrame(dict)",
+            "pd.create_df(dict)",
+            "pd.from_dict(dict)",
+            "pd.DataFrame.from_dict(dict)"
+        ],
+        "correct": 0
+    },
+    {
+        "question": "What method is used to merge two DataFrames on a common column in Pandas?",
+        "options": [
+            "df.join(other_df)",
+            "df.merge(other_df, on='column')",
+            "df.concat(other_df)",
+            "df.append(other_df)"
+        ],
+        "correct": 1
+    },
+    {
+        "question": "How do you perform an inner join in Pandas?",
+        "options": [
+            "df.merge(other, how='outer')",
+            "df.merge(other, how='left')",
+            "df.merge(other, how='inner')",
+            "df.merge(other, how='right')"
+        ],
+        "correct": 2
+    },
+    {
+        "question": "What does df.groupby('column').sum() do in Pandas?",
+        "options": [
+            "Sums all columns grouped by 'column'",
+            "Groups by sum and aggregates",
+            "Applies sum to the groupby object",
+            "Errors out"
+        ],
+        "correct": 0
+    },
+    {
+        "question": "How do you concatenate two DataFrames vertically in Pandas?",
+        "options": [
+            "pd.concat([df1, df2], axis=1)",
+            "pd.concat([df1, df2], axis=0)",
+            "df1.merge(df2)",
+            "df1.join(df2)"
+        ],
+        "correct": 1
+    },
+    {
+        "question": "What is the method to pivot a DataFrame in Pandas?",
+        "options": [
+            "df.pivot_table()",
+            "df.reshape()",
+            "df.transpose()",
+            "df.rotate()"
+        ],
+        "correct": 0
+    },
+    {
+        "question": "How do you apply a function to each row in a DataFrame?",
+        "options": [
+            "df.apply(func, axis=0)",
+            "df.apply(func, axis=1)",
+            "df.map(func)",
+            "df.transform(func)"
+        ],
+        "correct": 1
+    },
+    {
+        "question": "What does df.drop_duplicates() do?",
+        "options": [
+            "Drops rows with NaN",
+            "Removes duplicate rows",
+            "Drops columns",
+            "Shuffles data"
+        ],
+        "correct": 1
+    },
+    {
+        "question": "How do you select rows where a condition is true in Pandas?",
+        "options": [
+            "df[condition]",
+            "df.filter(condition)",
+            "df.where(condition)",
+            "df.select(condition)"
+        ],
+        "correct": 0
+    },
+    {
+        "question": "What is df.describe() used for?",
+        "options": [
+            "Describes DataFrame structure",
+            "Provides summary statistics",
+            "Plots data",
+            "Saves DataFrame"
+        ],
+        "correct": 1
+    },
+    {
+        "question": "How do you create a NumPy array?",
+        "options": [
+            "np.array([1,2,3])",
+            "np.create([1,2,3])",
+            "np.list([1,2,3])",
+            "np.vector([1,2,3])"
+        ],
+        "correct": 0
+    },
+    {
+        "question": "What does np.mean(array) compute?",
+        "options": [
+            "Median",
+            "Mean",
+            "Mode",
+            "Variance"
+        ],
+        "correct": 1
+    },
+    {
+        "question": "How do you define a class in Python?",
+        "options": [
+            "class MyClass: pass",
+            "def MyClass: pass",
+            "object MyClass: pass",
+            "type MyClass: pass"
+        ],
+        "correct": 0
+    },
+    {
+        "question": "How do you instantiate a class?",
+        "options": [
+            "obj = MyClass",
+            "obj = MyClass()",
+            "obj = new MyClass()",
+            "obj = create MyClass()"
+        ],
+        "correct": 1
+    },
+    {
+        "question": "What is the __init__ method for?",
+        "options": [
+            "Destructor",
+            "Initializer",
+            "Static method",
+            "Class method"
+        ],
+        "correct": 1
+    },
+    {
+        "question": "How do you define a recursive function for factorial?",
+        "options": [
+            "def fact(n): return n * fact(n-1) if n > 1 else 1",
+            "def fact(n): return n + fact(n-1) if n > 1 else 1",
+            "def fact(n): return fact(n-1)",
+            "def fact(n): return n"
+        ],
+        "correct": 0
+    },
+    {
+        "question": "In PySpark, how do you create a SparkSession?",
+        "options": [
+            "spark = SparkSession.builder.getOrCreate()",
+            "spark = SparkContext()",
+            "spark = SQLContext()",
+            "spark = HiveContext()"
+        ],
+        "correct": 0
+    },
+    {
+        "question": "How do you read a CSV into a DataFrame in PySpark?",
+        "options": [
+            "spark.read.csv('file.csv')",
+            "spark.load.csv('file.csv')",
+            "spark.import.csv('file.csv')",
+            "spark.df.from_csv('file.csv')"
+        ],
+        "correct": 0
+    },
+    {
+        "question": "What is df.join(other, on='col', how='inner') in PySpark?",
+        "options": [
+            "Concatenates DataFrames",
+            "Merges on column with inner join",
+            "Groups by column",
+            "Filters data"
+        ],
+        "correct": 1
+    },
+    {
+        "question": "How do you group by and aggregate in PySpark?",
+        "options": [
+            "df.groupby('col').agg({'col2': 'sum'})",
+            "df.groupBy('col').agg({'col2': 'sum'})",
+            "df.aggregate('col', 'sum')",
+            "df.sum('col')"
+        ],
+        "correct": 1
+    },
+    {
+        "question": "What does df.withColumn('new_col', expr) do in PySpark?",
+        "options": [
+            "Drops a column",
+            "Adds or replaces a column",
+            "Renames a column",
+            "Filters a column"
+        ],
+        "correct": 1
+    },
+    {
+        "question": "How do you filter rows in PySpark DataFrame?",
+        "options": [
+            "df.filter('col > 5')",
+            "df.where('col > 5')",
+            "Both A and B",
+            "df.select('col > 5')"
+        ],
+        "correct": 2
+    },
+    {
+        "question": "What is used for user-defined functions in PySpark?",
+        "options": [
+            "udf",
+            "lambda",
+            "def",
+            "func"
+        ],
+        "correct": 0
+    },
+    {
+        "question": "How do you cache a DataFrame in PySpark?",
+        "options": [
+            "df.persist()",
+            "df.cache()",
+            "Both A and B",
+            "df.save()"
+        ],
+        "correct": 2
+    },
+    {
+        "question": "What does df.distinct() do in PySpark?",
+        "options": [
+            "Removes duplicates",
+            "Counts unique",
+            "Sorts data",
+            "Partitions data"
+        ],
+        "correct": 0
+    },
+    {
+        "question": "How do you sort a DataFrame in PySpark?",
+        "options": [
+            "df.orderBy('col')",
+            "df.sort('col')",
+            "Both A and B",
+            "df.arrange('col')"
+        ],
+        "correct": 2
+    },
+    {
+        "question": "In Pandas, how do you handle missing values?",
+        "options": [
+            "df.fillna(0)",
+            "df.dropna()",
+            "Both A and B",
+            "df.remove_na()"
+        ],
+        "correct": 2
+    },
+    {
+        "question": "What is np.random.randn() for?",
+        "options": [
+            "Uniform random",
+            "Standard normal random",
+            "Integer random",
+            "Permutation"
+        ],
+        "correct": 1
+    },
+    {
+        "question": "How do you plot a DataFrame in Pandas?",
+        "options": [
+            "df.plot()",
+            "df.chart()",
+            "df.draw()",
+            "df.visualize()"
+        ],
+        "correct": 0
+    },
+    {
+        "question": "What does super() do in a class?",
+        "options": [
+            "Calls parent method",
+            "Creates instance",
+            "Defines static",
+            "Handles exceptions"
+        ],
+        "correct": 0
+    },
+    {
+        "question": "How do you define a static method?",
+        "options": [
+            "@staticmethod",
+            "@classmethod",
+            "@property",
+            "@decorator"
+        ],
+        "correct": 0
+    },
+    {
+        "question": "What is a lambda function?",
+        "options": [
+            "Named function",
+            "Anonymous function",
+            "Class method",
+            "Generator"
+        ],
+        "correct": 1
+    },
+    {
+        "question": "How do you create a list comprehension?",
+        "options": [
+            "[x for x in range(10)]",
+            "{x for x in range(10)}",
+            "(x for x in range(10))",
+            "All of above"
+        ],
+        "correct": 0
+    },
+    {
+        "question": "In PySpark, what is an RDD?",
+        "options": [
+            "Resilient Distributed Dataset",
+            "Relational Data Definition",
+            "Remote Data Driver",
+            "Resilient Dataframe Dataset"
+        ],
+        "correct": 0
+    },
+    {
+        "question": "How do you convert RDD to DataFrame in PySpark?",
+        "options": [
+            "rdd.toDF()",
+            "spark.createDataFrame(rdd)",
+            "Both A and B",
+            "rdd.convert()"
+        ],
+        "correct": 2
+    },
+    {
+        "question": "What does df.select('col1', 'col2') do?",
+        "options": [
+            "Filters rows",
+            "Selects columns",
+            "Groups columns",
+            "Joins columns"
+        ],
+        "correct": 1
+    },
+    {
+        "question": "How do you union two DataFrames in PySpark?",
+        "options": [
+            "df.union(other)",
+            "df.merge(other)",
+            "df.concat(other)",
+            "df.join(other)"
+        ],
+        "correct": 0
+    },
+    {
+        "question": "What is window function in PySpark?",
+        "options": [
+            "For aggregations over partitions",
+            "For filtering windows",
+            "For GUI",
+            "For timing"
+        ],
+        "correct": 0
+    },
+    {
+        "question": "How do you use recursion in Python for tree traversal?",
+        "options": [
+            "def traverse(node): if node: traverse(node.left); print(node); traverse(node.right)",
+            "Use loops only",
+            "Recursion not allowed",
+            "Use stacks"
+        ],
+        "correct": 0
+    },
+    {
+        "question": "In Pandas, what is MultiIndex?",
+        "options": [
+            "Single level index",
+            "Hierarchical indexing",
+            "Column index",
+            "Row index only"
+        ],
+        "correct": 1
+    },
+    {
+        "question": "How do you resample time series in Pandas?",
+        "options": [
+            "df.resample('D').sum()",
+            "df.time_resample()",
+            "df.aggregate_time()",
+            "df.group_time()"
+        ],
+        "correct": 0
+    },
+    {
+        "question": "What does sklearn train_test_split do?",
+        "options": [
+            "Splits data into train/test",
+            "Trains model",
+            "Tests model",
+            "Splits features"
+        ],
+        "correct": 0
+    },
+    {
+        "question": "How do you fit a linear regression in sklearn?",
+        "options": [
+            "model = LinearRegression().fit(X, y)",
+            "model = LinearRegression(X, y)",
+            "model.fit(X, y) with import",
+            "All above"
+        ],
+        "correct": 0
+    },
+    {
+        "question": "What is pd.read_csv('file')?",
+        "options": [
+            "Reads JSON",
+            "Reads CSV into DataFrame",
+            "Writes CSV",
+            "Reads Excel"
+        ],
+        "correct": 1
+    },
+    {
+        "question": "How do you rename columns in Pandas?",
+        "options": [
+            "df.rename(columns={'old': 'new'})",
+            "df.columns = ['new']",
+            "Both A and B",
+            "df.change_columns()"
+        ],
+        "correct": 2
+    },
+    {
+        "question": "What does df.iloc[0] select?",
+        "options": [
+            "First column",
+            "First row by position",
+            "First row by label",
+            "All rows"
+        ],
+        "correct": 1
+    },
+    {
+        "question": "How do you use map in Pandas Series?",
+        "options": [
+            "series.map(dict)",
+            "series.apply(dict)",
+            "series.transform(dict)",
+            "series.replace(dict)"
+        ],
+        "correct": 0
+    },
+    {
+        "question": "In PySpark, how do you broadcast a variable?",
+        "options": [
+            "spark.broadcast(var)",
+            "sc.broadcast(var)",
+            "spark.share(var)",
+            "sc.share(var)"
+        ],
+        "correct": 1
+    },
+    {
+        "question": "What is accumulator in PySpark?",
+        "options": [
+            "For shared variables in transformations",
+            "For actions only",
+            "For global counters",
+            "For partitioning"
+        ],
+        "correct": 2
+    },
+    {
+        "question": "How do you define a generator function?",
+        "options": [
+            "def gen(): yield 1",
+            "def gen(): return 1",
+            "def gen(): print(1)",
+            "def gen(): pass"
+        ],
+        "correct": 0
+    }
+]
+
+# Ensure we have at least 50; this list has 50.
+
+# Streamlit app
+st.title("Python Coding Quiz: DataFrames, Joins, and Data Science")
+
+# Session state to track quiz progress
+if 'quiz_started' not in st.session_state:
+    st.session_state.quiz_started = False
+    st.session_state.questions = []
+    st.session_state.current_question = 0
+    st.session_state.score = 0
+    st.session_state.answers = {}
+
+if st.button("Start Quiz"):
+    st.session_state.quiz_started = True
+    random.shuffle(questions)
+    st.session_state.questions = questions[:10]  # Select 10 random questions for the quiz
+    st.session_state.current_question = 0
+    st.session_state.score = 0
+    st.session_state.answers = {}
+
+if st.session_state.quiz_started:
+    if st.session_state.current_question < len(st.session_state.questions):
+        q = st.session_state.questions[st.session_state.current_question]
+        st.write(f"Question {st.session_state.current_question + 1}: {q['question']}")
+        
+        # Display options
+        selected = st.radio("Choose an option:", q['options'], key=f"q{st.session_state.current_question}")
+        
+        if st.button("Submit Answer"):
+            correct_idx = q['correct']
+            if q['options'].index(selected) == correct_idx:
+                st.session_state.score += 1
+            st.session_state.answers[st.session_state.current_question] = selected
+            st.session_state.current_question += 1
+            st.experimental_rerun()  # Refresh to next question
+    else:
+        st.write(f"Quiz completed! Your score: {st.session_state.score} / {len(st.session_state.questions)}")
+        if st.button("Restart Quiz"):
+            st.session_state.quiz_started = False
+            st.experimental_rerun()
+else:
+    st.write("Click 'Start Quiz' to begin. The quiz will feature 10 random questions from a pool of 50 covering Pandas DataFrames, joins, common data science functions, class creation, recursion, and PySpark basics.") 
